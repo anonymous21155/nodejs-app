@@ -8,6 +8,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/data', (req,res) => {
+  console.log('hey');
   console.log(req.body.hello);
   res.json({recieved: 'yes'})
 })
