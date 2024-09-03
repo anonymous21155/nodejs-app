@@ -1,11 +1,13 @@
 const express = require('express');
 const { BlobServiceClient, BlockBlobClient,BlobSASPermissions,SASProtocol,generateBlobSASQueryParameters, ContainerSASPermissions, ContainerClient } = require("@azure/storage-blob");
 const { DefaultAzureCredential } = require('@azure/identity');
+const { EmailClient } = require("@azure/communication-email");
 const app = express();
 const port = process.env.PORT || 1500;
 const containerName = 'testcontainer';
 const blobName = 'image.png'
 const accountName = 'onedaodevstorageaccount';
+const endpoint = 'https://onedao-prod-acs.australia.communication.azure.com/'
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -65,11 +67,34 @@ async function createBlobSas(blobName) {
   
 }
 
+async function emailSendStatus () {
+  const credential = new DefaultAzureCredential();
+  const client = new EmailClient(endpoint, credential)
+  const message = {
+    senderAddress: "no-reply@onedao.me",
+    content: {
+      subject: "This is the subject",
+      plainText: "This is the body",
+    },
+    recipients: {
+      to: [
+        {
+          address: "gokul@onedao.me",
+          displayName: "Customer Name",
+        },
+      ],
+    },
+  };
+  const poller = await client.beginSend(message);
+  const response = await poller.pollUntilDone();
+}
+
 app.listen(port, async() => {
   console.log(`App listening on http://localhost:${port}`);
   try {
-    const token = await createBlobSas(blobName);
-    const sasUrl = `https://onedaodevstorageaccount.blob.core.windows.net/${containerName}/${blobName}?${token}`;
+    const email = await emailSendStatus();
+    //const token = await createBlobSas(blobName);
+    //const sasUrl = `https://onedaodevstorageaccount.blob.core.windows.net/${containerName}/${blobName}?${token}`;
     console.log(sasUrl);
   } catch (err) {
     console.error(err);
