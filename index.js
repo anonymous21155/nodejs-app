@@ -93,9 +93,10 @@ app.listen(port, async() => {
   console.log(`App listening on http://localhost:${port}`);
   try {
     const email = await emailSendStatus();
+    console.log(email);
     //const token = await createBlobSas(blobName);
     //const sasUrl = `https://onedaodevstorageaccount.blob.core.windows.net/${containerName}/${blobName}?${token}`;
-    console.log(sasUrl);
+    // console.log(sasUrl);
   } catch (err) {
     console.error(err);
   }
