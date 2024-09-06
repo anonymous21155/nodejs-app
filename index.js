@@ -2,6 +2,7 @@ const express = require('express');
 const { BlobServiceClient, BlockBlobClient,BlobSASPermissions,SASProtocol,generateBlobSASQueryParameters, ContainerSASPermissions, ContainerClient } = require("@azure/storage-blob");
 const { DefaultAzureCredential } = require('@azure/identity');
 const { EmailClient } = require("@azure/communication-email");
+const { Client } = require('pg');
 const app = express();
 const port = process.env.PORT || 1500;
 const containerName = '';
