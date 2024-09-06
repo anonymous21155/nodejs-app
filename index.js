@@ -4,10 +4,10 @@ const { DefaultAzureCredential } = require('@azure/identity');
 const { EmailClient } = require("@azure/communication-email");
 const app = express();
 const port = process.env.PORT || 1500;
-const containerName = 'testcontainer';
+const containerName = '';
 const blobName = 'image.png'
-const accountName = 'onedaodevstorageaccount';
-const endpoint = 'https://onedao-prod-acs.australia.communication.azure.com/'
+const accountName = '';
+const endpoint = ''
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -35,7 +35,7 @@ async function createBlobSas(blobName) {
 
   // Best practice: use managed identity - DefaultAzureCredential
   const blobServiceClient = new BlobServiceClient(
-      'https://onedaodevstorageaccount.blob.core.windows.net',
+      '',
       new DefaultAzureCredential()
     );
 
@@ -89,11 +89,33 @@ async function emailSendStatus () {
   const response = await poller.pollUntilDone();
 }
 
+async function database () {
+  try {
+    const credential = new DefaultAzureCredential();
+    const accessToken = await credential.getToken('https://ossrdbms-aad.database.windows.net/.default');
+    const client = new Client({
+      host: process.env.AZURE_POSTGRESQL_HOST,
+      user: process.env.AZURE_POSTGRESQL_USER,
+      password: accessToken.token,
+      database: process.env.AZURE_POSTGRESQL_DATABASE,
+      port: 5432,
+      ssl: process.env.AZURE_POSTGRESQL_SSL
+    });
+    await client.connect();
+    console.log('Connected to the database');
+    await client.end();
+    console.log('Disconnected from the database');
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 app.listen(port, async() => {
   console.log(`App listening on http://localhost:${port}`);
   try {
-    const email = await emailSendStatus();
-    console.log(email);
+    //const email = await emailSendStatus();
+    const db = await database();
+    console.log('suucess');
     //const token = await createBlobSas(blobName);
     //const sasUrl = `https://onedaodevstorageaccount.blob.core.windows.net/${containerName}/${blobName}?${token}`;
     // console.log(sasUrl);
