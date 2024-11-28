@@ -1,7 +1,9 @@
 const express = require('express');
 const { BlobServiceClient, BlockBlobClient,BlobSASPermissions,SASProtocol,generateBlobSASQueryParameters, ContainerSASPermissions, ContainerClient } = require("@azure/storage-blob");
+const { CommunicationServiceManagementClient } = require("@azure/arm-communication");
 const { DefaultAzureCredential } = require('@azure/identity');
 const { EmailClient } = require("@azure/communication-email");
+const { createNewMeetingAsync } = require('./Shared/graph');
 const { Client } = require('pg');
 const app = express();
 const port = process.env.PORT || 1500;
@@ -9,6 +11,10 @@ const containerName = '';
 const blobName = 'image.png'
 const accountName = '';
 const endpoint = ''
+const subscriptionId = "3a8654fc-c078-4536-9417-b31a2bd2d351";
+const credential = new DefaultAzureCredential();
+const client = new CommunicationServiceManagementClient(credential, subscriptionId);
+let teamsMeetingLink;
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -111,12 +117,41 @@ async function database () {
   }
 }
 
+const suppress = async() => {
+  const resourceGroupName = 'RG-OneDAO-prod';
+  const emailServiceName = 'onedao-prod-communicationservice';
+  const domainResourceName = 'onedao.me';
+  const suppressionListResourceName = 'test';
+  const suppressionListAddressId = '123';
+  const parameters = { 
+    "email": "gokulrdev920@gmail.com" // Should match the email address you would like to block from receiving your messages
+};
+  
+  const rslt = await client.suppressionLists.delete(
+    resourceGroupName,
+    emailServiceName,
+    domainResourceName,
+    suppressionListResourceName,
+);
+console.log(rslt);
+}
+
+const createTeamsMeeting = async() => {
+  teamsMeetingLink = await createNewMeetingAsync(userId);
+    const body = JSON.stringify(teamsMeetingLink);
+    const meeting = JSON.parse(body);
+    console.log(meeting);
+}
+
 app.listen(port, async() => {
   console.log(`App listening on http://localhost:${port}`);
+  
   try {
+    createTeamsMeeting();
     //const email = await emailSendStatus();
-    const db = await database();
-    console.log('suucess');
+    //const db = await database();
+    //console.log('suucess');
+   // const suppressResult = await suppress();
     //const token = await createBlobSas(blobName);
     //const sasUrl = `https://onedaodevstorageaccount.blob.core.windows.net/${containerName}/${blobName}?${token}`;
     // console.log(sasUrl);

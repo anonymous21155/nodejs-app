@@ -8,9 +8,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/arm-communication": "^4.1.0",
     "@azure/communication-email": "^1.0.0",
     "@azure/identity": "^4.4.1",
     "@azure/storage-blob": "^12.24.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "express": "^4.19.2",
     "pg": "^8.12.0"
   }
