@@ -29,7 +29,7 @@ async function createNewMeetingAsync(userId) {
   ensureGraphForAppOnlyAuth();
   let startTime = await startDateTimeAsync();
   let endTime = await endDateTimeAsync();
-  const newMeeting = `/users/${userId}/calendar/events`;
+  const newMeeting = `/users/0ec46b81-bff8-4773-86ff-4fce12894053/calendar/events`;
   
   const event = {
   subject: 'Customer Service Meeting',
